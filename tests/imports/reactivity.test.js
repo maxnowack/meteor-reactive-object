@@ -56,5 +56,71 @@ if (Meteor.isClient) {
       chai.assert.equal(typeof reactive.foo, 'undefined');
       chai.assert.equal(runs, 2);
     });
+
+    it('should have reactive sub objects', () => {
+      const reactive = reactiveObject();
+
+      let runs = 0;
+      Tracker.autorun(() => {
+        runs += 1;
+        const value = reactive.foo && reactive.foo.bar; // eslint-disable-line
+      });
+
+      chai.assert.equal(typeof reactive.foo, 'undefined');
+      chai.assert.equal(runs, 1);
+
+      reactive.foo = { bar: 0 };
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(reactive.foo.bar, 0);
+      chai.assert.equal(runs, 2);
+
+      reactive.foo.bar = 1;
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(reactive.foo.bar, 1);
+      chai.assert.equal(runs, 3);
+
+      reactive.foo.bar = 1;
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(reactive.foo.bar, 1);
+      chai.assert.equal(runs, 3);
+
+      delete reactive.foo;
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(typeof reactive.foo, 'undefined');
+      chai.assert.equal(runs, 4);
+    });
+
+    it('should be reactive if sub object changes', () => {
+      const reactive = reactiveObject();
+
+      let runs = 0;
+      Tracker.autorun(() => {
+        runs += 1;
+        const value = reactive.foo; // eslint-disable-line
+      });
+
+      chai.assert.equal(typeof reactive.foo, 'undefined');
+      chai.assert.equal(runs, 1);
+
+      reactive.foo = { bar: 0 };
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(reactive.foo.bar, 0);
+      chai.assert.equal(runs, 2);
+
+      reactive.foo.bar = 1;
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(reactive.foo.bar, 1);
+      chai.assert.equal(runs, 3);
+
+      reactive.foo.bar = 1;
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(reactive.foo.bar, 1);
+      chai.assert.equal(runs, 3);
+
+      delete reactive.foo.bar;
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(typeof reactive.foo.bar, 'undefined');
+      chai.assert.equal(runs, 4);
+    });
   });
 }

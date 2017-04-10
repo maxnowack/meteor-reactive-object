@@ -1,6 +1,6 @@
 import Tracker from './tracker';
 
-export default function reactiveProxy(initial = {}, compare = (a, b) => a === b) {
+export default function reactiveProxy(initial = {}, compare = (a, b) => a === b, changeCallback) {
   const deps = {};
   const ensureDep = (name) => {
     if (!deps[name]) deps[name] = new Tracker.Dependency();
@@ -15,15 +15,28 @@ export default function reactiveProxy(initial = {}, compare = (a, b) => a === b)
     set: (obj, key, value) => {
       const dep = ensureDep(key);
       const oldValue = obj[key];
-      obj[key] = value;
-      if (!compare(oldValue, value)) dep.changed();
+      const changed = () => {
+        dep.changed();
+        if (changeCallback) changeCallback(key, value);
+      };
+
+      obj[key] = typeof value === 'object'
+        ? reactiveProxy(value, compare, changed)
+        : value;
+
+      if (!compare(oldValue, value)) changed();
       return value || true;
     },
     deleteProperty: (obj, key) => {
       const dep = ensureDep(key);
       const exists = key in obj;
       delete obj[key];
-      if (exists) dep.changed();
+      const changed = () => {
+        dep.changed();
+        if (changeCallback) changeCallback(key);
+      };
+
+      if (exists) changed();
       return true;
     },
   });
