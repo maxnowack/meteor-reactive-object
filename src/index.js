@@ -1,6 +1,12 @@
 import Tracker from './tracker';
 
+export function isSupported() {
+  return typeof Proxy !== 'undefined';
+}
+
 export default function reactiveProxy(initial = {}, compare = (a, b) => a === b, changeCallback) {
+  if (!isSupported()) throw new Error('ES6 proxies are not supported by your environment!');
+
   const deps = {};
   const ensureDep = (name) => {
     if (!deps[name]) deps[name] = new Tracker.Dependency();

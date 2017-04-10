@@ -10,8 +10,9 @@ Makes an object reactive using es6 proxies
 
 ````es6
 import { Tracker } from 'meteor/tracker'
-import reactiveObject from 'meteor-reactive-object'
+import reactiveObject, { isSupported } from 'meteor-reactive-object'
 
+if (!isSupported()) throw new Error('ES6 proxies are not supported by your environment!')
 const obj = reactiveObject() // pass an object to define a initial value
 
 Tracker.autorun(() => {
