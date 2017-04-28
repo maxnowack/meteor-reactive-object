@@ -1,6 +1,6 @@
 {
   "name": "meteor-reactive-object",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "makes an object reactive using es6 proxies",
   "main": "dist/index.js",
   "scripts": {
