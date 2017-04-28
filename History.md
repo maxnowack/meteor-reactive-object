@@ -1,4 +1,4 @@
-## vNEXT
+## v1.1.0, 2017-04-28
 * enable turning off recursiveness.
 
 ## v1.0.2, 2017-04-28
