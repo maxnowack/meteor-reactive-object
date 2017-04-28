@@ -90,6 +90,39 @@ if (Meteor.isClient) {
       chai.assert.equal(runs, 4);
     });
 
+    it('shouldn\'t have reactive sub objects if deactivated', () => {
+      const reactive = reactiveObject({}, { recursive: false });
+
+      let runs = 0;
+      Tracker.autorun(() => {
+        runs += 1;
+        const value = reactive.foo && reactive.foo.bar; // eslint-disable-line
+      });
+
+      chai.assert.equal(typeof reactive.foo, 'undefined');
+      chai.assert.equal(runs, 1);
+
+      reactive.foo = { bar: 0 };
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(reactive.foo.bar, 0);
+      chai.assert.equal(runs, 2);
+
+      reactive.foo.bar = 1;
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(reactive.foo.bar, 1);
+      chai.assert.equal(runs, 2);
+
+      reactive.foo.bar = 2;
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(reactive.foo.bar, 2);
+      chai.assert.equal(runs, 2);
+
+      delete reactive.foo;
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(typeof reactive.foo, 'undefined');
+      chai.assert.equal(runs, 3);
+    });
+
     it('should be reactive if sub object changes', () => {
       const reactive = reactiveObject();
 

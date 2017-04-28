@@ -1,3 +1,6 @@
+## vNEXT
+* enable turning off recursiveness.
+
 ## v1.0.2, 2017-04-28
 * fix iterating over arrays inside a reactive object.
 

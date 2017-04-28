@@ -6,8 +6,15 @@ export function isSupported() {
   return typeof Proxy !== 'undefined';
 }
 
-export default function reactiveProxy(initial = {}, compare = (a, b) => a === b, changeCallback) {
+const defaultCompare = (a, b) => a === b;
+
+export default function reactiveProxy(initial = {}, compare, changeCallback) {
   if (!isSupported()) throw new Error('ES6 proxies are not supported by your environment!');
+
+  const options = Object.assign({}, {
+    compare: defaultCompare,
+    recursive: true,
+  }, typeof compare === 'function' ? { compare } : compare);
 
   const deps = {};
   const ensureDep = (name) => {
@@ -31,12 +38,11 @@ export default function reactiveProxy(initial = {}, compare = (a, b) => a === b,
         }
         if (changeCallback) changeCallback(key, value);
       };
-
-      obj[key] = typeof value === 'object'
-        ? reactiveProxy(value, compare, changed)
+      obj[key] = options.recursive && typeof value === 'object'
+        ? reactiveProxy(value, options, changed)
         : value;
 
-      if (!compare(oldValue, value)) changed();
+      if (!options.compare(oldValue, value)) changed();
       return value || true;
     },
     deleteProperty: (obj, key) => {

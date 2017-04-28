@@ -13,7 +13,7 @@ import { Tracker } from 'meteor/tracker'
 import reactiveObject, { isSupported } from 'meteor-reactive-object'
 
 if (!isSupported()) throw new Error('ES6 proxies are not supported by your environment!')
-const obj = reactiveObject() // pass an object to define a initial value
+const obj = reactiveObject() // reactiveObject(intitialValue: object = {}, options: object = { recursive: true, compare: (a, b) => a === b })
 
 Tracker.autorun(() => {
   console.log(obj.foo)
