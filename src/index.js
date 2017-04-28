@@ -1,5 +1,7 @@
 import Tracker from './tracker';
 
+const internalKeys = ['constructor', '__proto__'];
+
 export function isSupported() {
   return typeof Proxy !== 'undefined';
 }
@@ -14,15 +16,19 @@ export default function reactiveProxy(initial = {}, compare = (a, b) => a === b,
   };
   return new Proxy(initial, {
     get: (obj, key) => {
-      const dep = ensureDep(key);
-      dep.depend();
+      if (!internalKeys.includes(key)) {
+        const dep = ensureDep(key);
+        dep.depend();
+      }
       return obj[key];
     },
     set: (obj, key, value) => {
-      const dep = ensureDep(key);
       const oldValue = obj[key];
       const changed = () => {
-        dep.changed();
+        if (!internalKeys.includes(key)) {
+          const dep = ensureDep(key);
+          dep.changed();
+        }
         if (changeCallback) changeCallback(key, value);
       };
 
@@ -34,11 +40,13 @@ export default function reactiveProxy(initial = {}, compare = (a, b) => a === b,
       return value || true;
     },
     deleteProperty: (obj, key) => {
-      const dep = ensureDep(key);
       const exists = key in obj;
       delete obj[key];
       const changed = () => {
-        dep.changed();
+        if (!internalKeys.includes(key)) {
+          const dep = ensureDep(key);
+          dep.changed();
+        }
         if (changeCallback) changeCallback(key);
       };
 
