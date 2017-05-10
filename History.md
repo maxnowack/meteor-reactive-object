@@ -1,3 +1,6 @@
+## v.NEXT
+* don't create reactive object for `null` values
+
 ## v1.1.0, 2017-04-28
 * enable turning off recursiveness.
 
