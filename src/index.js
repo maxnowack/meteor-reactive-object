@@ -38,7 +38,7 @@ export default function reactiveProxy(initial = {}, compare, changeCallback) {
         }
         if (changeCallback) changeCallback(key, value);
       };
-      obj[key] = options.recursive && typeof value === 'object'
+      obj[key] = options.recursive && typeof value === 'object' && value != null
         ? reactiveProxy(value, options, changed)
         : value;
 
