@@ -205,5 +205,35 @@ if (Meteor.isClient) {
       chai.assert.equal(reactive.result.length, 4);
       chai.assert.equal(runs, 2);
     });
+
+    it('should be reactive with a date', () => {
+      const reactive = reactiveObject();
+
+      let runs = 0;
+      Tracker.autorun(() => {
+        runs += 1;
+        const value = reactive.foo; // eslint-disable-line
+      });
+
+      chai.assert.equal(typeof reactive.foo, 'undefined');
+      chai.assert.equal(runs, 1);
+
+      const date = new Date();
+      reactive.foo = date;
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(reactive.foo.getTime(), date.getTime());
+      chai.assert.equal(runs, 2);
+
+      const date2 = new Date();
+      reactive.foo = date2;
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(reactive.foo.getTime(), date2.getTime());
+      chai.assert.equal(runs, 3);
+
+      delete reactive.foo;
+      Tracker.flush({ _throwFirstError: true });
+      chai.assert.equal(typeof reactive.foo, 'undefined');
+      chai.assert.equal(runs, 4);
+    });
   });
 }
