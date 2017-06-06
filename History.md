@@ -1,4 +1,6 @@
 ## v.NEXT
+
+## v1.1.1, 2017-06-06
 * don't wrap `Date` objects in a proxy.
 * don't create reactive object for `null` values
 
